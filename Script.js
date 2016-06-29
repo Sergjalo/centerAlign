@@ -16,18 +16,16 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			if (vars[i].name.indexOf("vListObjectsMain")>-1) 		
 			{   
 				sNames=vars[i].value.split(" ");
-				listPagesMain= $(".QvFrame.Document_"+sNames[sNames.length-1]); 
 				elementsUnderGrid = $(".QvFrame.Document_"+sNames[0]);
-				for (var j=1; j<sNames.length-1; j++){
+				for (var j=1; j<sNames.length; j++){	
 					elementsUnderGrid=elementsUnderGrid.add($(".QvFrame.Document_"+sNames[j]));
 				}
 			}
 			if (vars[i].name.indexOf("vListObjectsDet")>-1)
 			{   
 				sNames=vars[i].value.split(" ");
-				listPagesDet= $(".QvFrame.Document_"+sNames[sNames.length-1]); 
 				elementsUnderGridDet = $(".QvFrame.Document_"+sNames[0]);
-				for (var j=1; j<sNames.length-1; j++){
+				for (var j=1; j<sNames.length; j++){	
 					elementsUnderGridDet=elementsUnderGridDet.add($(".QvFrame.Document_"+sNames[j]));
 				}
 			}
@@ -47,7 +45,6 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			}
 		}
 	});
-		
 	//------------------------------------------------------------------- EPAM
 	
 	function centerIt() {
@@ -60,19 +57,16 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			{
 				var grMainY = grDet.position().top+grDet.outerHeight();
 				elementsUnderGridDet.css("top", grMainY+10);
-				listPagesDet.css("top", grMainY+48);
 			}	
 			else {
 				var grMainY = grMain.position().top+grMain.outerHeight();
 				elementsUnderGrid.css("top", grMainY+10);
-				listPagesMain.css("top", grMainY+48);
 			}	
 			// change height of underlying textbox
 			elementsBeyondGrid.each(function(){
 				$(this).css("height", grMainY-$(this).position().top+60).children().filter(".QvContent").css("height", grMainY-$(this).position().top+60);
 			});
 		}
-		
 		//------------------------------------------------------------------- EPAM	
 
 		if(!($("body").hasClass("centerAlign"))) {
