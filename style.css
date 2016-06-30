@@ -1,6 +1,47 @@
-/*
-.brandingDemo{background:url("/snow.jpg") no-repeat top left;}
-*/
 .centerAlign .master{position:relative;margin:0 auto;}
-/*#MainContainer{width:960px;background:white;padding-top:28px; position:relative;display:inline-block;}
-#PageContainer{display:inline-block;padding-top:0px;}*/
+
+/* Selected values */
+.QvSelected {
+    background-color: #dde3eb;
+    color: #000000;
+}
+
+/* Associated values */
+.QvOptional {
+    background-color: white;
+    color: black;
+}
+
+/* Excluded values */
+.QvExcluded {
+    background-color: #EEEEEE;
+    color: #666666;
+}
+
+/* Selection rectangle when selecting in chart */
+.QvDragRect {
+    background-color: #0099ff;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0;
+}
+
+/* Selected LED */
+.QvSelected_Led_363636 {
+  background-image: url("/QvAjaxZfc/QvsViewClient.aspx?datamode=binary&name=LED&slot=&public=only&state=1&color=#3455DB") !important;
+  color: #696969 !important;
+}
+ 
+/* Selected LED checkbox */
+.QvSelected_LED_CHECK_363636 {
+    background-image: url("/QvAjaxZfc/QvsViewClient.aspx?datamode=binary&name=LED&slot=&public=only&state=1&check=true&color=#3455DB") !important;
+	color: #696969 !important;
+}
+
+
+/* Selected corner tag */
+.QvSelected_CORNERTAG_17_363636 {
+    background-image: url("/QvAjaxZfc/QvsViewClient.aspx?datamode=binary&name=CORNERTAG&host=Local&slot=&public=only&color=%230099ff&width=17&height=17");
+    background-repeat: no-repeat;
+    color: #363636;
+}

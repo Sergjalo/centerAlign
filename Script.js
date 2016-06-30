@@ -2,7 +2,6 @@ var cApath = Qva.Remote + "?public=only&type=Document&name=Extensions/centerAlig
 Qva.LoadCSS(cApath + "style.css");
 Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	var _this = this;
-	//default width is 1024 to act as a minimum width for your content 
 
 	//------------------------------------------------------------------- EPAM
 	var elementsUnderGrid;	 // set of elements under Main grid
@@ -56,15 +55,15 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			if (grMain.css("display")=="none" )
 			{
 				var grMainY = grDet.position().top+grDet.outerHeight();
-				elementsUnderGridDet.css("top", grMainY+10);
+				elementsUnderGridDet.css("top", grMainY+18);
 			}	
 			else {
 				var grMainY = grMain.position().top+grMain.outerHeight();
-				elementsUnderGrid.css("top", grMainY+10);
+				elementsUnderGrid.css("top", grMainY+18);
 			}	
 			// change height of underlying textbox
 			elementsBeyondGrid.each(function(){
-				$(this).css("height", grMainY-$(this).position().top+60).children().filter(".QvContent").css("height", grMainY-$(this).position().top+60);
+				$(this).css("height", grMainY-$(this).position().top+72).children().filter(".QvContent").css("height", grMainY-$(this).position().top+72);
 			});
 		}
 		//------------------------------------------------------------------- EPAM	
@@ -91,6 +90,14 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 		});
 		$(".centerAlign .master").css("width", maxRight + "px");
 		$(".qvtr-tabs").css("width", $(".master").width() + "px");
+		
+		NoGreenLED();
 	}
 	_this.Document.SetOnUpdateComplete(centerIt);
+	
+	function NoGreenLED()
+	{ 
+		// Some green LEDs do not have their image set in the stylesheet, so we have to directly overwrite it
+		$('img.Qv_LED').attr("src","/QvAjaxZfc/QvsViewClient.aspx?datamode=binary&name=LED&host=Local&slot=&public=only&color=%230099ff" );
+	}
 });
