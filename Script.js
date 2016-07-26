@@ -7,41 +7,37 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	var elementsUnderGrid;	 // set of elements under Main grid
 	var elementsUnderGridDet; // set of elements under Detail grid
 	var elementsBeyondGrid;	 // one textbox
+	var elementsBeyondGridWhite; // one textbox
+	var elementsBeyondGridWhiteDet; // one textbox
+	var bNotExistVarOrEmpty  = {val: false,	toString:function(){return this.val} };;
+	
 
 	var	docQv = Qv.GetCurrentDocument();
 	docQv.GetAllVariables(function(vars) {
 		var sNames;
+		var varCount  = {val: 0, toString:function(){return this.val} };
+
+		bNotExistVarOrEmpty.val= false;
 		for (var i = 0; i < vars.length; i++) {
-			if (vars[i].name.indexOf("vListObjectsMain")>-1) 		
-			{   
-				sNames=vars[i].value.split(" ");
-				elementsUnderGrid = $(".QvFrame.Document_"+sNames[0]);
-				for (var j=1; j<sNames.length; j++){	
-					elementsUnderGrid=elementsUnderGrid.add($(".QvFrame.Document_"+sNames[j]));
-				}
-			}
-			if (vars[i].name.indexOf("vListObjectsDet")>-1)
-			{   
-				sNames=vars[i].value.split(" ");
-				elementsUnderGridDet = $(".QvFrame.Document_"+sNames[0]);
-				for (var j=1; j<sNames.length; j++){	
-					elementsUnderGridDet=elementsUnderGridDet.add($(".QvFrame.Document_"+sNames[j]));
-				}
-			}
-			if (vars[i].name.indexOf("vListObjectsBeyondGrid")>-1)	
-			{   
-				sNames=vars[i].value.split(" ");
-				elementsBeyondGrid = $(".QvFrame.Document_"+sNames[0]);
-				for (var j=1; j<sNames.length; j++){
-					elementsBeyondGrid=elementsBeyondGrid.add($(".QvFrame.Document_"+sNames[j]));
-				}
-			}
-			if (vars[i].name.indexOf("vListMainAndDetailGrids")>-1)	 
+			
+			
+			if (vars[i].name.indexOf("vListObjectsMain")>-1) 			{ elementsUnderGrid			=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value);	}	
+			if (vars[i].name.indexOf("vListObjectsDet")>-1) 			{ elementsUnderGridDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value);	}			
+			if (vars[i].name.indexOf("vListObjectsBeyondGrid")>-1) 		{ elementsBeyondGrid		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridMain")>-1) 		{ elementsBeyondGridWhite	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridDet")>-1) 		{ elementsBeyondGridWhiteDet=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+
+			if (vars[i].name.indexOf("vListMainAndDetailGrids")>-1)
 			{
+				varCount.val++;	
 				sNames=vars[i].value.split(" ");
 				grMain=$(".QvFrame.Document_"+sNames[0]);
 				grDet =$(".QvFrame.Document_"+sNames[1]);
 			}
+		}
+		if (varCount.val<6)
+		{
+			bNotExistVarOrEmpty.val=true;
 		}
 	});
 	//------------------------------------------------------------------- EPAM
@@ -49,9 +45,8 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	function centerIt() {
 		
 		//------------------------------------------------------------------- EPAM
-		if (elementsUnderGrid!=undefined) 
+		if ((elementsUnderGrid!=undefined) && (!bNotExistVarOrEmpty.val))
 		{
-			
 			if (grMain.css("display")=="none" )
 			{
 				var grMainY = grDet.position().top+grDet.outerHeight();
@@ -64,6 +59,12 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			// change height of underlying textbox
 			elementsBeyondGrid.each(function(){
 				$(this).css("height", grMainY-$(this).position().top+72).children().filter(".QvContent").css("height", grMainY-$(this).position().top+72);
+			});
+			elementsBeyondGridWhite.each(function(){
+				$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
+			});
+			elementsBeyondGridWhiteDet.each(function(){
+				$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
 			});
 		}
 		//------------------------------------------------------------------- EPAM	
@@ -79,7 +80,7 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			$("body").css("background-position", "center 30px");
 		}
 		var maxRight = 1024;		
-		//loop through all QV alements on the page and determine the maximum right position on the page
+		//loop through all QV elements on the page and determine the maximum right position on the page
 		//in order to determine the bounding box of the QV doc.  It needs to be done this way because all of the elements
 		//are absolutely positioned
 		$(".QvFrame").each(function(){
@@ -94,10 +95,32 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 		NoGreenLED();
 	}
 	_this.Document.SetOnUpdateComplete(centerIt);
+
+	// get jQuery objects through names in variables
+	function Get_elemets(varCount, bNotExistVarOrEmpty, s)
+	{ 
+		varCount.val++;	
+		var sNames=s.split(" ");
+		if (sNames.length==0) 
+		{
+			bNotExistVarOrEmpty.val=true;
+			return null;
+		}
+		else 
+		{
+			var elem = $(".QvFrame.Document_"+sNames[0]);
+			for (var j=1; j<sNames.length; j++){	
+				elem=elem.add($(".QvFrame.Document_"+sNames[j]));
+			}
+			return  elem;
+		}	
+	}
 	
 	function NoGreenLED()
 	{ 
 		// Some green LEDs do not have their image set in the stylesheet, so we have to directly overwrite it
 		$('img.Qv_LED').attr("src","/QvAjaxZfc/QvsViewClient.aspx?datamode=binary&name=LED&host=Local&slot=&public=only&color=%230099ff" );
 	}
+	
+	elementsUnderGrid = $(".QvFrame.Document_"+sNames[0]);
 });
