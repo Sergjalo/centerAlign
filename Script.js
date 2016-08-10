@@ -9,6 +9,7 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	var elementsBeyondGrid;	 // one textbox
 	var elementsBeyondGridWhite; // one textbox
 	var elementsBeyondGridWhiteDet; // one textbox
+	var elementsBeyondGridWhiteDetBottom;
 	var bNotExistVarOrEmpty  = {val: false,	toString:function(){return this.val} };;
 	
 
@@ -25,7 +26,8 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			if (vars[i].name.indexOf("vListObjectsDet")>-1) 			{ elementsUnderGridDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value);	}			
 			if (vars[i].name.indexOf("vListObjectsBeyondGrid")>-1) 		{ elementsBeyondGrid		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridMain")>-1) 		{ elementsBeyondGridWhite	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
-			if (vars[i].name.indexOf("vWhiteBgBeyondGridDet")>-1) 		{ elementsBeyondGridWhiteDet=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridDet")>-1) 		{ elementsBeyondGridWhiteDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtBottom")>-1)  { elementsBeyondGridWhiteDetBottom 	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 
 			if (vars[i].name.indexOf("vListMainAndDetailGrids")>-1)
 			{
@@ -33,6 +35,8 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 				sNames=vars[i].value.split(" ");
 				grMain=$(".QvFrame.Document_"+sNames[0]);
 				grDet =$(".QvFrame.Document_"+sNames[1]);
+				grDetBottom = (sNames.length>2) ? $(".QvFrame.Document_"+sNames[2]) : null;
+				console.log(sNames);
 			}
 		}
 		if (varCount.val<6)
@@ -47,25 +51,44 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 		//------------------------------------------------------------------- EPAM
 		if ((elementsUnderGrid!=undefined) && (!bNotExistVarOrEmpty.val))
 		{
+			var grMainYBottom = 0;
 			if (grMain.css("display")=="none" )
 			{
 				var grMainY = grDet.position().top+grDet.outerHeight();
-				elementsUnderGridDet.css("top", grMainY+18);
+				
+				if (grDetBottom !== null)
+				{
+					grDetBottom.css("top", grMainY+72);
+					elementsBeyondGridWhiteDetBottom.css("top", grMainY+72);
+					grMainYBottom = grDetBottom.position().top+grDetBottom.outerHeight();
+				}	
+				// fit white substrate to detail grid (top if there are two)
+				elementsBeyondGridWhiteDet.each(function(){
+					$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
+				});
+				// fit white substrate to bottom detail grid if it exist
+				if (grMainYBottom > 0)
+				{
+					elementsBeyondGridWhiteDetBottom.each(function(){
+						$(this).css("height", grMainYBottom-$(this).position().top).children().filter(".QvContent").css("height", grMainYBottom-$(this).position().top);
+					});
+				}
 			}	
 			else {
 				var grMainY = grMain.position().top+grMain.outerHeight();
 				elementsUnderGrid.css("top", grMainY+18);
+
+				// fit white substrate to main grid
+				elementsBeyondGridWhite.each(function(){
+					$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
+				});
 			}	
 			// change height of underlying textbox
 			elementsBeyondGrid.each(function(){
-				$(this).css("height", grMainY-$(this).position().top+72).children().filter(".QvContent").css("height", grMainY-$(this).position().top+72);
+				$(this).css("height", Math.max(grMainY, grMainYBottom)-$(this).position().top+72).children().filter(".QvContent").css("height", Math.max(grMainY, grMainYBottom)-$(this).position().top+72);
 			});
-			elementsBeyondGridWhite.each(function(){
-				$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
-			});
-			elementsBeyondGridWhiteDet.each(function(){
-				$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
-			});
+			// move elements below lowest chart
+			elementsUnderGridDet.css("top", Math.max(grMainY, grMainYBottom)+18);
 		}
 		//------------------------------------------------------------------- EPAM	
 
@@ -121,6 +144,4 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 		// Some green LEDs do not have their image set in the stylesheet, so we have to directly overwrite it
 		$('img.Qv_LED').attr("src","/QvAjaxZfc/QvsViewClient.aspx?datamode=binary&name=LED&host=Local&slot=&public=only&color=%230099ff" );
 	}
-	
-	elementsUnderGrid = $(".QvFrame.Document_"+sNames[0]);
 });
