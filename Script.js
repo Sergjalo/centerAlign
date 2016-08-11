@@ -4,15 +4,22 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	var _this = this;
 
 	//------------------------------------------------------------------- EPAM
-	var elementsUnderGrid;	 // set of elements under Main grid
-	var elementsUnderGridDet; // set of elements under Detail grid
-	var elementsBeyondGrid;	 // one textbox
-	var elementsBeyondGridWhite; // one textbox
-	var elementsBeyondGridWhiteDet; // one textbox
-	var elementsBeyondGridWhiteDetBottom;
-	var bNotExistVarOrEmpty  = {val: false,	toString:function(){return this.val} };;
-	
+	var elementsUnderGrid;	 			// set of elements under summary grid
+	var elementsUnderGridDet; 			// set of elements under bottom detail grid
+	var elementsBeyondGrid;	 			// dark substrate beyond all charts (summary or detail)
+	var elementsBeyondGridWhite; 		// vWhiteBgBeyondGridMain - white substrate for summary chart
+	var elementsBeyondGridWhiteDet; 	// vWhiteBgBeyondGridDet - white substrate for first (top) detail chart
+	var elementsBeyondGridWhiteDetBottom; // vWhiteBgBeyondGridDtBottom - white substrate for second detail chart
 
+	var elementsLineAboveBottomChart;	// vListSecondLineObj 4 elements that placed between two detail charts
+
+	//filter between two detail charts consist of two objects- 
+	var elementsBottomFlt1; 			// vListSecondLineFlt1 for ALL list object 
+	var elementsBottomFlt2; 			// vListSecondLineFlt2 for list object with column names
+	
+	// false if there not enough variables
+	var bNotExistVarOrEmpty  = {val: false,	toString:function(){return this.val} };
+	
 	var	docQv = Qv.GetCurrentDocument();
 	docQv.GetAllVariables(function(vars) {
 		var sNames;
@@ -29,6 +36,10 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridDet")>-1) 		{ elementsBeyondGridWhiteDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtBottom")>-1)  { elementsBeyondGridWhiteDetBottom 	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 
+			if (vars[i].name.indexOf("vListSecondLineObj")>-1)   { elementsLineAboveBottomChart		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vListSecondLineFlt1")>-1)  { elementsBottomFlt1 				=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vListSecondLineFlt2")>-1)  { elementsBottomFlt2 				=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+
 			if (vars[i].name.indexOf("vListMainAndDetailGrids")>-1)
 			{
 				varCount.val++;	
@@ -36,10 +47,9 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 				grMain=$(".QvFrame.Document_"+sNames[0]);
 				grDet =$(".QvFrame.Document_"+sNames[1]);
 				grDetBottom = (sNames.length>2) ? $(".QvFrame.Document_"+sNames[2]) : null;
-				console.log(sNames);
 			}
 		}
-		if (varCount.val<6)
+		if (varCount.val<10)
 		{
 			bNotExistVarOrEmpty.val=true;
 		}
@@ -52,32 +62,51 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 		if ((elementsUnderGrid!=undefined) && (!bNotExistVarOrEmpty.val))
 		{
 			var grMainYBottom = 0;
+			
+			// define is it detail view or summary
 			if (grMain.css("display")=="none" )
 			{
+				// evaluate Y position of bottom edge of detail chart. If there are two - of one that is on top
 				var grMainY = grDet.position().top+grDet.outerHeight();
 				
+				// is there another detail chart placed below?
 				if (grDetBottom !== null)
 				{
-					grDetBottom.css("top", grMainY+72);
+					// shift it and white substrate under top chart
+					grDetBottom.each(function(){
+						$(this).css("top", grMainY+72);
+					});	
 					elementsBeyondGridWhiteDetBottom.css("top", grMainY+72);
+					
+					// get same Y position as grMainY but for bottom detail
 					grMainYBottom = grDetBottom.position().top+grDetBottom.outerHeight();
+
+					// fit white substrate to bottom detail grid
+					elementsBeyondGridWhiteDetBottom.each(function(){
+						$(this).css("height", grMainYBottom-$(this).position().top).children().filter(".QvContent").css("height", grMainYBottom-$(this).position().top);
+					});
+					
+					// place elements that are between detail charts
+					elementsLineAboveBottomChart.each(function(){
+						$(this).css("top", grMainY+18);
+					});
+					elementsBottomFlt1.each(function(){
+						$(this).css("top", grMainY+58);
+					});
+					elementsBottomFlt2.each(function(){
+						$(this).css("top", grMainY+78);
+					});
 				}	
 				// fit white substrate to detail grid (top if there are two)
 				elementsBeyondGridWhiteDet.each(function(){
 					$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
 				});
-				// fit white substrate to bottom detail grid if it exist
-				if (grMainYBottom > 0)
-				{
-					elementsBeyondGridWhiteDetBottom.each(function(){
-						$(this).css("height", grMainYBottom-$(this).position().top).children().filter(".QvContent").css("height", grMainYBottom-$(this).position().top);
-					});
-				}
 			}	
 			else {
 				var grMainY = grMain.position().top+grMain.outerHeight();
-				elementsUnderGrid.css("top", grMainY+18);
-
+				elementsUnderGrid.each(function(){
+					$(this).css("top", grMainY+18);
+				});
 				// fit white substrate to main grid
 				elementsBeyondGridWhite.each(function(){
 					$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
@@ -88,7 +117,9 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 				$(this).css("height", Math.max(grMainY, grMainYBottom)-$(this).position().top+72).children().filter(".QvContent").css("height", Math.max(grMainY, grMainYBottom)-$(this).position().top+72);
 			});
 			// move elements below lowest chart
-			elementsUnderGridDet.css("top", Math.max(grMainY, grMainYBottom)+18);
+			elementsUnderGridDet.each(function(){
+				$(this).css("top", Math.max(grMainY, grMainYBottom)+18);
+			});
 		}
 		//------------------------------------------------------------------- EPAM	
 
