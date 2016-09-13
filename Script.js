@@ -10,6 +10,8 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	var elementsBeyondGridWhite; 		// vWhiteBgBeyondGridMain - white substrate for summary chart
 	var elementsBeyondGridWhiteDet; 	// vWhiteBgBeyondGridDet - white substrate for first (top) detail chart
 	var elementsBeyondGridWhiteDetBottom; // vWhiteBgBeyondGridDtBottom - white substrate for second detail chart
+	
+	var elementsBetweenDetTablesWhite; // vWhiteLineBetweenDetTables - white separating line between detail tables
 
 	var elementsLineAboveBottomChart;	// vListSecondLineObj 4 elements that placed between two detail charts
 
@@ -35,6 +37,8 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridMain")>-1) 		{ elementsBeyondGridWhite	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridDet")>-1) 		{ elementsBeyondGridWhiteDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtBottom")>-1)  { elementsBeyondGridWhiteDetBottom 	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			
+			if (vars[i].name.indexOf("vWhiteLineBetweenDetTables")>-1)  { elementsBetweenDetTablesWhite 	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 
 			if (vars[i].name.indexOf("vListSecondLineObj")>-1)   { elementsLineAboveBottomChart		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			if (vars[i].name.indexOf("vListSecondLineFlt1")>-1)  { elementsBottomFlt1 				=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
@@ -49,7 +53,7 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 				grDetBottom = (sNames.length>2) ? $(".QvFrame.Document_"+sNames[2]) : null;
 			}
 		}
-		if (varCount.val<10)
+		if (varCount.val<11)
 		{
 			bNotExistVarOrEmpty.val=true;
 		}
@@ -72,12 +76,18 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 				// is there another detail chart placed below?
 				if (grDetBottom !== null)
 				{
+					// shift white line between two detail tables below first detail
+					elementsBetweenDetTablesWhite.css("top", grMainY+30);
+					
+					// evaluate Y position of white separating line
+					var lineSepY = elementsBetweenDetTablesWhite.position().top+elementsBetweenDetTablesWhite.outerHeight();
+					
 					// shift it and white substrate under top chart
 					grDetBottom.each(function(){
-						$(this).css("top", grMainY+72);
+						$(this).css("top", lineSepY+72);
 					});	
-					elementsBeyondGridWhiteDetBottom.css("top", grMainY+72);
-					
+					elementsBeyondGridWhiteDetBottom.css("top", lineSepY+72);
+									
 					// get same Y position as grMainY but for bottom detail
 					grMainYBottom = grDetBottom.position().top+grDetBottom.outerHeight();
 
@@ -88,13 +98,13 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 					
 					// place elements that are between detail charts
 					elementsLineAboveBottomChart.each(function(){
-						$(this).css("top", grMainY+18);
+						$(this).css("top", lineSepY+18);
 					});
 					elementsBottomFlt1.each(function(){
-						$(this).css("top", grMainY+58);
+						$(this).css("top", lineSepY+59);
 					});
 					elementsBottomFlt2.each(function(){
-						$(this).css("top", grMainY+78);
+						$(this).css("top", lineSepY+79);
 					});
 				}	
 				// fit white substrate to detail grid (top if there are two)
@@ -137,12 +147,16 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 		//loop through all QV elements on the page and determine the maximum right position on the page
 		//in order to determine the bounding box of the QV doc.  It needs to be done this way because all of the elements
 		//are absolutely positioned
+		//only for elems that are in centered container
 		$(".QvFrame").each(function(){
-			var tMR = $(this).position().left + $(this).width();
-			if(tMR > maxRight){
-				maxRight = tMR;
+			if ($(this).parents('.master').length) {
+				var tMR = $(this).position().left + $(this).width();
+				if(tMR > maxRight){
+					maxRight = tMR;
+				}
 			}
 		});
+		
 		$(".centerAlign .master").css("width", maxRight + "px");
 		$(".qvtr-tabs").css("width", $(".master").width() + "px");
 		
@@ -174,5 +188,20 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	{ 
 		// Some green LEDs do not have their image set in the stylesheet, so we have to directly overwrite it
 		$('img.Qv_LED').attr("src","/QvAjaxZfc/QvsViewClient.aspx?datamode=binary&name=LED&host=Local&slot=&public=only&color=%230099ff" );
+		
+		// change arrow in filters dropdown menu 
+		$('.cell-icon.cell-ODDC-icon').removeClass( "cell-icon cell-ODDC-icon" ).addClass( "ui-icon QvArrowDropDown");
+		
+		// change arrow in serch box dropdown menu
+		$('.prop-dyn-dynamic-dropdown-search-open').removeClass( "prop-icon-24x24 prop-dyn-dynamic-dropdown-search-open" ).addClass( "ui-icon QvArrowDropDownSearch");
+		$('.prop-dyn-dynamic-dropdown-search-close').removeClass( "prop-icon-24x24 prop-dyn-dynamic-dropdown-search-close" ).addClass( "ui-icon QvArrowDropDownSearch");
+		
+		//remove search icon in the search box
+		$('.prop-icon-24x24.prop-dyn-dynamic-dropdown-search-icon').removeClass( "prop-icon-24x24 prop-dyn-dynamic-dropdown-search-icon" );
+		
+		// chenge native icon for table Export to Excel
+		$('.QvCaptionIcon.caption-icon-16x16.caption-XL-dark-icon').width(185).height(40);
+		$('.QvCaptionIcon.caption-icon-16x16.caption-XL-dark-icon').removeClass( "caption-icon-16x16 caption-XL-dark-icon" ).addClass( "ui-icon QvDownloadTableIcon" );
+		$('.QvDownloadTableIcon').attr('title','Download Table to Excel');
 	}
 });
