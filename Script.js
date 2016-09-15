@@ -131,6 +131,15 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 				$(this).css("top", Math.max(grMainY, grMainYBottom)+18);
 			});
 		}
+		$(".Qv_multiline.Qv_middle").filter(function(index){
+			return (($(this).parent(".injected").parent().css("text-align")=="left") ||
+				($(this).parent().parent(".injected").parent().css("text-align")=="left"))
+		}).css('padding-left', 5);
+		$(".Qv_multiline.Qv_middle").filter(function(index){
+			return ($(this).parent(".injected").parent().css("text-align")=="right")
+		}).each(function(){
+			$(this).width($(this).parent().width()-5);
+		});	
 		//------------------------------------------------------------------- EPAM	
 
 		if(!($("body").hasClass("centerAlign"))) {
