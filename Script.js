@@ -14,6 +14,7 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	var elementsBetweenDetTablesWhite; // vWhiteLineBetweenDetTables - white separating line between detail tables
 
 	var elementsLineAboveBottomChart;	// vListSecondLineObj 4 elements that placed between two detail charts
+	var deviceType;	 				    // type of device from Qlik 1 - mobile 0 - desktop. Is readed through text object TXVERSION =If(WildMatch(ClientPlatform(),'*mobile*')>0,1,0)
 
 	//filter between two detail charts consist of two objects- 
 	var elementsBottomFlt1; 			// vListSecondLineFlt1 for ALL list object 
@@ -63,8 +64,8 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	function centerIt() {
 		
 		//------------------------------------------------------------------- EPAM
-		if ((elementsUnderGrid!=undefined) && (!bNotExistVarOrEmpty.val))
-		{
+	if ((elementsUnderGrid!=undefined) && (!bNotExistVarOrEmpty.val))
+	{
 			var grMainYBottom = 0;
 			
 			// define is it detail view or summary
@@ -130,7 +131,7 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 			elementsUnderGridDet.each(function(){
 				$(this).css("top", Math.max(grMainY, grMainYBottom)+18);
 			});
-		}
+		
 		$(".Qv_multiline.Qv_middle").filter(function(index){
 			return (($(this).parent(".injected").parent().css("text-align")=="left") ||
 				($(this).parent().parent(".injected").parent().css("text-align")=="left"))
@@ -157,19 +158,25 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 		//in order to determine the bounding box of the QV doc.  It needs to be done this way because all of the elements
 		//are absolutely positioned
 		//only for elems that are in centered container
-		$(".QvFrame").each(function(){
-			if ($(this).parents('.master').length) {
-				var tMR = $(this).position().left + $(this).width();
-				if(tMR > maxRight){
-					maxRight = tMR;
+		//only for desctop versions
+		deviceType=$(".QvFrame.Document_TXVERSION").children(".QvContent").find("td").html();
+		if (deviceType==0)
+		{
+			$(".QvFrame").each(function(){
+				if ($(this).parents('.master').length) {
+					var tMR = $(this).position().left + $(this).width();
+					if(tMR > maxRight){
+						maxRight = tMR;
+					}
 				}
-			}
-		});
+			});
 		
-		$(".centerAlign .master").css("width", maxRight + "px");
-		$(".qvtr-tabs").css("width", $(".master").width() + "px");
+			$(".centerAlign .master").css("width", maxRight + "px");
+			$(".qvtr-tabs").css("width", $(".master").width() + "px");
+		}	
 		
 		NoGreenLED();
+	}
 	}
 	_this.Document.SetOnUpdateComplete(centerIt);
 
