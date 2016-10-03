@@ -1,6 +1,6 @@
-var cApath = Qva.Remote + "?public=only&type=Document&name=Extensions/centerAlignPENSKE/";
+var cApath = Qva.Remote + "?public=only&type=Document&name=Extensions/penskefleet/";
 Qva.LoadCSS(cApath + "style.css");
-Qva.AddDocumentExtension('centerAlignPENSKE', function() {
+Qva.AddDocumentExtension('penskefleet', function() {
 	var _this = this;
 
 	//------------------------------------------------------------------- EPAM
@@ -61,11 +61,10 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 	});
 	//------------------------------------------------------------------- EPAM
 	
-	function centerIt() {
+	function makeAdjustments() {
 		
-		//------------------------------------------------------------------- EPAM
 	if ((elementsUnderGrid!=undefined) && (!bNotExistVarOrEmpty.val))
-	{
+		{
 			var grMainYBottom = 0;
 			
 			// define is it detail view or summary
@@ -132,53 +131,21 @@ Qva.AddDocumentExtension('centerAlignPENSKE', function() {
 				$(this).css("top", Math.max(grMainY, grMainYBottom)+18);
 			});
 		
-		$(".Qv_multiline.Qv_middle").filter(function(index){
-			return (($(this).parent(".injected").parent().css("text-align")=="left") ||
-				($(this).parent().parent(".injected").parent().css("text-align")=="left"))
-		}).css('padding-left', 5);
-		$(".Qv_multiline.Qv_middle").filter(function(index){
-			return ($(this).parent(".injected").parent().css("text-align")=="right")
-		}).each(function(){
-			$(this).width($(this).parent().width()-5);
-		});	
-		//------------------------------------------------------------------- EPAM	
-
-		if(!($("body").hasClass("centerAlign"))) {
-			$("body").addClass("centerAlign");
-			//wrap a container around the whole document and center it.
-			$("body").append('<div class="master" />').find('.master').append($('#PageContainer'));
-			$("#MainContainer").css("position", "relative");
-			//center the tabs if they exist
-			$("head").append("<style>.qvtr-tabs{margin:0 auto !important;}</style>");
-			//center the background image if there is one.
-			$("body").css("background-position", "center 30px");
+			// padding in cells
+			$(".Qv_multiline.Qv_middle").filter(function(index){
+				return (($(this).parent(".injected").parent().css("text-align")=="left") ||
+					($(this).parent().parent(".injected").parent().css("text-align")=="left"))
+			}).css('padding-left', 5);
+			$(".Qv_multiline.Qv_middle").filter(function(index){
+				return ($(this).parent(".injected").parent().css("text-align")=="right")
+			}).each(function(){
+				$(this).width($(this).parent().width()-5);
+			});	
+			NoGreenLED();
 		}
-		var maxRight = 1024;		
-		//loop through all QV elements on the page and determine the maximum right position on the page
-		//in order to determine the bounding box of the QV doc.  It needs to be done this way because all of the elements
-		//are absolutely positioned
-		//only for elems that are in centered container
-		//only for desctop versions
-		deviceType=$(".QvFrame.Document_TXVERSION").children(".QvContent").find("td").html();
-		if (deviceType==0)
-		{
-			$(".QvFrame").each(function(){
-				if ($(this).parents('.master').length) {
-					var tMR = $(this).position().left + $(this).width();
-					if(tMR > maxRight){
-						maxRight = tMR;
-					}
-				}
-			});
-		
-			$(".centerAlign .master").css("width", maxRight + "px");
-			$(".qvtr-tabs").css("width", $(".master").width() + "px");
-		}	
-		
-		NoGreenLED();
 	}
-	}
-	_this.Document.SetOnUpdateComplete(centerIt);
+	
+	_this.Document.SetOnUpdateComplete(makeAdjustments);
 
 	// get jQuery objects through names in variables
 	function Get_elemets(varCount, bNotExistVarOrEmpty, s)
