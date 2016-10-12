@@ -9,8 +9,10 @@ Qva.AddDocumentExtension('penskefleet', function() {
 	var elementsBeyondGrid;	 			// dark substrate beyond all charts (summary or detail)
 	var elementsBeyondGridWhite; 		// vWhiteBgBeyondGridMain - white substrate for summary chart
 	var elementsBeyondGridWhiteDet; 	// vWhiteBgBeyondGridDet - white substrate for first (top) detail chart
-	var elementsBeyondGridWhiteDetBottom; // vWhiteBgBeyondGridDtBottom - white substrate for second detail chart
-	
+	var elementsBeyondGridWhiteDetBottom;	// vWhiteBgBeyondGridDtBottom - white substrate for second detail chart
+	var elementsBeyondGridWhiteDetBottomSL;	// text object over dimensions on detail bottom table
+	var elementsBeyondGridWhiteDetUpSL	;	// text object over dimensions on detail bottom table
+		
 	var elementsBetweenDetTablesWhite; // vWhiteLineBetweenDetTables - white separating line between detail tables
 
 	var elementsLineAboveBottomChart;	// vListSecondLineObj 4 elements that placed between two detail charts
@@ -30,14 +32,14 @@ Qva.AddDocumentExtension('penskefleet', function() {
 
 		bNotExistVarOrEmpty.val= false;
 		for (var i = 0; i < vars.length; i++) {
-			
-			
 			if (vars[i].name.indexOf("vListObjectsMain")>-1) 			{ elementsUnderGrid			=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value);	}	
 			if (vars[i].name.indexOf("vListObjectsDet")>-1) 			{ elementsUnderGridDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value);	}			
 			if (vars[i].name.indexOf("vListObjectsBeyondGrid")>-1) 		{ elementsBeyondGrid		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridMain")>-1) 		{ elementsBeyondGridWhite	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridDet")>-1) 		{ elementsBeyondGridWhiteDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
-			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtBottom")>-1)  { elementsBeyondGridWhiteDetBottom 	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtBottom")>-1)  	{ elementsBeyondGridWhiteDetBottom 	 =Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtBotSecLine")>-1)  { elementsBeyondGridWhiteDetBottomSL =Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtUpSecLine")>-1)   { elementsBeyondGridWhiteDetUpSL =Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			
 			if (vars[i].name.indexOf("vWhiteLineBetweenDetTables")>-1)  { elementsBetweenDetTablesWhite 	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 
@@ -53,8 +55,10 @@ Qva.AddDocumentExtension('penskefleet', function() {
 				grDet =$(".QvFrame.Document_"+sNames[1]);
 				grDetBottom = (sNames.length>2) ? $(".QvFrame.Document_"+sNames[2]) : null;
 			}
+			console.log(varCount.val+" "+vars[i].name)
 		}
-		if (varCount.val<11)
+		
+		if (varCount.val<13)
 		{
 			bNotExistVarOrEmpty.val=true;
 		}
@@ -87,6 +91,7 @@ Qva.AddDocumentExtension('penskefleet', function() {
 						$(this).css("top", lineSepY+72);
 					});	
 					elementsBeyondGridWhiteDetBottom.css("top", lineSepY+72);
+					elementsBeyondGridWhiteDetBottomSL.css("top", lineSepY+72+90);
 									
 					// get same Y position as grMainY but for bottom detail
 					grMainYBottom = grDetBottom.position().top+grDetBottom.outerHeight();
@@ -94,6 +99,11 @@ Qva.AddDocumentExtension('penskefleet', function() {
 					// fit white substrate to bottom detail grid
 					elementsBeyondGridWhiteDetBottom.each(function(){
 						$(this).css("height", grMainYBottom-$(this).position().top).children().filter(".QvContent").css("height", grMainYBottom-$(this).position().top);
+					});
+					
+					// fit text box to prevent click
+					elementsBeyondGridWhiteDetBottomSL.each(function(){
+						$(this).css("height", grMainYBottom-$(this).position().top-21).children().filter(".QvContent").css("height", grMainYBottom-$(this).position().top-21);
 					});
 					
 					// place elements that are between detail charts
@@ -110,6 +120,10 @@ Qva.AddDocumentExtension('penskefleet', function() {
 				// fit white substrate to detail grid (top if there are two)
 				elementsBeyondGridWhiteDet.each(function(){
 					$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
+				});
+				// fit text box over table to prevent click
+				elementsBeyondGridWhiteDetUpSL.each(function(){
+					$(this).css("height", grMainY-$(this).position().top-21).children().filter(".QvContent").css("height", grMainY-$(this).position().top-21);
 				});
 			}	
 			else {
