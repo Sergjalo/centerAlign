@@ -46,13 +46,13 @@
 
 /*Arrow for filters dropdown list-item*/
 .QvArrowDropDown {
-	background-image: url("/QvAjaxZfc/QvsViewClient.aspx?public=only&type=document&name=Extensions/centerAlignPENSKE/icon-arrow-sort-down.png");
+	background-image: url("/QvAjaxZfc/QvsViewClient.aspx?public=only&type=document&name=Extensions/penskefleet/icon-arrow-sort-down.png");
 	margin-top: 5px;
 }
 
 /*Arrow for search box dropdown list-item*/
 .QvArrowDropDownSearch {
-	background-image: url("/QvAjaxZfc/QvsViewClient.aspx?public=only&type=document&name=Extensions/centerAlignPENSKE/icon-arrow-sort-down.png");
+	background-image: url("/QvAjaxZfc/QvsViewClient.aspx?public=only&type=document&name=Extensions/penskefleet/icon-arrow-sort-down.png");
 	border: none;
 	margin-top: 15px;
 	background-color: #FFFFFF;
@@ -60,6 +60,6 @@
 
 /*Download table icon instead native Export to Excel icon*/
 .QvDownloadTableIcon {
-	background-image: url("/QvAjaxZfc/QvsViewClient.aspx?public=only&type=document&name=Extensions/centerAlignPENSKE/download-btn.png");
+	background-image: url("/QvAjaxZfc/QvsViewClient.aspx?public=only&type=document&name=Extensions/penskefleet/download-btn.png");
 	margin-top: 3px;
 }
