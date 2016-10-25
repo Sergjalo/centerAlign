@@ -103,7 +103,7 @@ Qva.AddDocumentExtension('penskefleet', function() {
 					
 					// fit text box to prevent click
 					elementsBeyondGridWhiteDetBottomSL.each(function(){
-						$(this).css("height", grMainYBottom-$(this).position().top-21).children().filter(".QvContent").css("height", grMainYBottom-$(this).position().top-21);
+						$(this).css("height", grMainYBottom-$(this).position().top-0).children().filter(".QvContent").css("height", grMainYBottom-$(this).position().top-0);
 					});
 					
 					// place elements that are between detail charts
@@ -123,7 +123,7 @@ Qva.AddDocumentExtension('penskefleet', function() {
 				});
 				// fit text box over table to prevent click
 				elementsBeyondGridWhiteDetUpSL.each(function(){
-					$(this).css("height", grMainY-$(this).position().top-21).children().filter(".QvContent").css("height", grMainY-$(this).position().top-21);
+					$(this).css("height", grMainY-$(this).position().top-0).children().filter(".QvContent").css("height", grMainY-$(this).position().top-0);
 				});
 			}	
 			else {
