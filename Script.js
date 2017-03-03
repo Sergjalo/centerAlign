@@ -21,6 +21,7 @@ Qva.AddDocumentExtension('penskefleet', function() {
 	var elementsBottomFlt1; 			// vListSecondLineFlt1 for ALL list object 
 	var elementsBottomFlt2; 			// vListSecondLineFlt2 for list object with column names
 	
+	// spacing dropdown list
 	var defH;							// default height of item element in a dropdown pivot table list. 19 for font AvenirLTW01-95Black size 12
 	var newH; 							// new height of item element in a dropdown pivot table list.
 	
