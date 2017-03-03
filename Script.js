@@ -15,10 +15,14 @@ Qva.AddDocumentExtension('penskefleet', function() {
 
 	var elementsLineAboveBottomChart;	// vListSecondLineObj 4 elements that placed between two detail charts
 	var deviceType;	 				    // type of device from Qlik 1 - mobile 0 - desktop. Is readed through text object TXVERSION =If(WildMatch(ClientPlatform(),'*mobile*')>0,1,0)
+	// deviceType=$(".QvFrame.Document_TXVERSION").children(".QvContent").find("td").html();
 
-	//filter between two detail charts consist of two objects- 
+	// filter between two detail charts consist of two objects- 
 	var elementsBottomFlt1; 			// vListSecondLineFlt1 for ALL list object 
 	var elementsBottomFlt2; 			// vListSecondLineFlt2 for list object with column names
+	
+	var defH;							// default height of item element in a dropdown pivot table list. 19 for font AvenirLTW01-95Black size 12
+	var newH; 							// new height of item element in a dropdown pivot table list.
 	
 	// false if there not enough variables
 	var bNotExistVarOrEmpty  = {val: false,	toString:function(){return this.val} };
@@ -30,12 +34,13 @@ Qva.AddDocumentExtension('penskefleet', function() {
 
 		bNotExistVarOrEmpty.val= false;
 		for (var i = 0; i < vars.length; i++) {
+			try{
 			if (vars[i].name.indexOf("vListObjectsMain")>-1) 			{ elementsUnderGrid			=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value);	}	
 			if (vars[i].name.indexOf("vListObjectsDet")>-1) 			{ elementsUnderGridDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value);	}			
 			if (vars[i].name.indexOf("vListObjectsBeyondGrid")>-1) 		{ elementsBeyondGrid		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			if (vars[i].name.indexOf("vWhiteBgBeyondGridMain")>-1) 		{ elementsBeyondGridWhite	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
-			if (vars[i].name.indexOf("vWhiteBgBeyondGridDet")>-1) 		{ elementsBeyondGridWhiteDet		=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
-			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtBottom")>-1)  	{ elementsBeyondGridWhiteDetBottom 	 =Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridDet")>-1) 		{ elementsBeyondGridWhiteDet		 =Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
+			if (vars[i].name.indexOf("vWhiteBgBeyondGridDtBottom")>-1) 	{ elementsBeyondGridWhiteDetBottom 	 =Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 			
 			if (vars[i].name.indexOf("vWhiteLineBetweenDetTables")>-1)  { elementsBetweenDetTablesWhite 	=Get_elemets(varCount, bNotExistVarOrEmpty, vars[i].value); }
 
@@ -51,9 +56,15 @@ Qva.AddDocumentExtension('penskefleet', function() {
 				grDet =$(".QvFrame.Document_"+sNames[1]);
 				grDetBottom = (sNames.length>2) ? $(".QvFrame.Document_"+sNames[2]) : null;
 			}
+			if (vars[i].name.indexOf("vDropDownListSizeDef")>-1) { defH=vars[i].value; varCount.val++; }
+			if (vars[i].name.indexOf("vDropDownListSizeNew")>-1) { newH=vars[i].value; varCount.val++; }
+			}
+			catch(err) {
+				console.log(err);
+				console.log('at iteration ' + i +', var name is '+ vars[i].name + ', val is '+ vars[i].value + ', type is '+ typeof vars[i]);
+			}
 		}
-		
-		if (varCount.val<11)
+		if (varCount.val<13)
 		{
 			bNotExistVarOrEmpty.val=true;
 		}
@@ -61,11 +72,13 @@ Qva.AddDocumentExtension('penskefleet', function() {
 	//------------------------------------------------------------------- EPAM
 	
 	function makeAdjustments() {
-		
-	if ((elementsUnderGrid!=undefined) && (!bNotExistVarOrEmpty.val))
+	if ((elementsUnderGrid!=undefined) && (!bNotExistVarOrEmpty.val) && (grMain.length>0)) 
 		{
 			var grMainYBottom = 0;
 			
+			//only for desktop versions
+			//if (deviceType==0) {	}
+	
 			// define is it detail view or summary
 			if (grMain.css("display")=="none" )
 			{
@@ -118,6 +131,7 @@ Qva.AddDocumentExtension('penskefleet', function() {
 				});
 				// fit white substrate to main grid
 				elementsBeyondGridWhite.each(function(){
+					//console.log($(this).css("height")+" _top="+$(this).position().top+" grMainY=" +grMainY);
 					$(this).css("height", grMainY-$(this).position().top).children().filter(".QvContent").css("height", grMainY-$(this).position().top);
 				});
 			}	
@@ -132,16 +146,71 @@ Qva.AddDocumentExtension('penskefleet', function() {
 		
 			// padding in cells
 			$(".Qv_multiline.Qv_middle").filter(function(index){
-				return (($(this).parent(".injected").parent().css("text-align")=="left") ||
+				return ((($(this).parent(".injected").parent().css("text-align")=="left") ||
 					($(this).parent().parent(".injected").parent().css("text-align")=="left"))
+					// to not impact on filters
+					&&
+					($(this).siblings(".Qv_CellIcon_right").length==0))
 			}).css('padding-left', 5);
+			
 			$(".Qv_multiline.Qv_middle").filter(function(index){
 				return ($(this).parent(".injected").parent().css("text-align")=="right")
 			}).each(function(){
 				$(this).width($(this).parent().width()-5);
 			});	
-			NoGreenLED();
+
+			//--------------	*spacing in dropdown listboxes		------------------
+			//console.log("spacing");
+
+			itemsFAll=$(".QvFrame.DS").children(".QvContent").children(".QvListbox");
+			if (itemsFAll.children(".Qv_ScrollbarHorizontalDivider").css("display")!="none") 
+			{ 
+				hScroll=12;
+			} else {
+				hScroll=0;
+			}
+			//newH=45; // new spacing
+			// define number of items
+			k=itemsFAll.children().first().find(".QvOptional, .QvExcluded, .QvSelected").length; //QvSelected_Led_363636
+			// calculate new total height
+			newHeight=k*newH+hScroll;
+			// set new total height
+			itemsFlt=$(".QvFrame.DS").height(newHeight).children(".QvContent").height(newHeight).children(".QvListbox").height(newHeight).children().first().height(newHeight).find(".QvOptional, .QvExcluded, .QvSelected");
+			// obtain old row height
+			//defH=26;//itemsFlt.first().height(); //19
+			//console.log(itemsFlt.first().height()+" "+newH);
+			//shift rows according to new width
+			itemsFlt.each(function(){
+				//console.log(" height="+$(this).height());
+				if($(this).height()==defH) {
+					//tp0=$(this).position().top;
+					//tp=$(this).position().top/defH*newH;
+					$(this).css("top",$(this).position().top/defH*newH);
+					//console.log($(this).attr("title") + " _ "+ tp0 + " _ "+tp+ " _ defH="+defH+ " _ newH=" +newH + " height="+$(this).height());
+				}
+			});
+			// set new row height
+			itemsFlt.height(newH).children().height(newH).children().height(newH);
+			//console.log("items count:"+ k + " nh="+newHeight);
+			// border and padding
+			itemsFlt.children().css("border-top-width",1);
+			itemsFlt.children().css("border-top-color","#e8e8ea");
+			itemsFlt.children().css("border-top-style","solid");
+			itemsFlt.children().children().css("padding-top",newH/3);
+			//padding for listbox
+			$(".QvFrame").children(".QvContent").children(".QvListbox").find(".Qv_multiline").css("padding-top",10);
+			
+			// place scroll bars at the bottom 
+			if (hScroll>0) 
+			{
+				//console.log(itemsFAll.children(".Qv_ScrollbarHorizontalDivider").css("display")+hScroll);
+				itemsFAll.children(".TouchScrollbar").css("top",newHeight-(hScroll-2));
+				itemsFAll.children(".Qv_ScrollbarHorizontalDivider, .Qv_ScrollbarBackground").css("top",newHeight-hScroll);
+			}
+			//--------------	spacing in dropdown listboxes*		------------------
+			//defH=26;
 		}
+		NoGreenLED();
 	}
 	
 	_this.Document.SetOnUpdateComplete(makeAdjustments);
